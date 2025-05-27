@@ -396,3 +396,11 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+*.sln
+bin/*
+bin-int/*
+*.vcxproj
+*.filters
+vendor/glad/bin/*
+vendor/glad/bin-int/*
