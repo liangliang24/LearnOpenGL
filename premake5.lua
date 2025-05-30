@@ -59,6 +59,11 @@ project "LearnOpenGL"
         "ImGui"
     }
 
+    defines
+    {
+        "FMT_UNICODE=0"
+    }
+
     filter "system:windows"
 		systemversion "latest"
 

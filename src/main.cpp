@@ -1,13 +1,10 @@
-#define FMT_UNICODE 0 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <spdlog/spdlog.h>
 #include "imgui.h"
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
-
-#include <iostream>
-#include <fstream>
+#include "Shader.h"
 
 #define WINDOW_WIDTH 1920
 #define WINDOW_HEIGHT 1080
@@ -22,26 +19,6 @@ void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         spdlog::info("press key escape");
-}
-
-std::string ReadFileAsString(const std::string& filepath)
-{
-    std::string result;
-    std::ifstream in(filepath, std::ios::in | std::ios::binary);
-    if (in)
-    {
-        in.seekg(0, std::ios::end);
-        result.resize((size_t)in.tellg());
-        in.seekg(0, std::ios::beg);
-        in.read(&result[0], result.size());
-        in.close();
-    }
-    else
-    {
-        spdlog::error("Could not open file '{0}'", filepath);
-    }
-
-    return result;
 }
 
 int main()
@@ -86,71 +63,10 @@ int main()
     glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
     spdlog::info("Maximum nr of vertex attributes supported: {0}", nrAttributes);
 
-    ImVec4 clear_color = ImVec4(0.2f, 0.3f, 0.3f, 1.0f);
-    ImVec4 triangle_color = ImVec4(0.7f, 0.1f, 0.1f, 1.0f);
+    ImVec4 clearColor = ImVec4(0.2f, 0.3f, 0.3f, 1.0f);
+    ImVec4 triangleColor = ImVec4(0.7f, 0.1f, 0.1f, 1.0f);
 
-    std::string vertexShaderSource = ReadFileAsString("assets/shaders/VertexShader.glsl");
-    unsigned int vertexShader;
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    
-    const GLchar* vertexShaderSourceStr = vertexShaderSource.c_str();
-    glShaderSource(vertexShader, 1, &vertexShaderSourceStr, nullptr);
-    glCompileShader(vertexShader);
-
-    int success;
-    char infoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, nullptr, infoLog);
-        spdlog::error("VertexShader compile FAILED!{0}", infoLog);
-    }
-    else
-    {
-        spdlog::info("VertexShader compile SUCCESS!");
-    }
-
-    std::string fragmentShaderSource = ReadFileAsString("assets/shaders/FragmentShader.glsl");
-    unsigned int fragmentShader;
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-
-    const GLchar* fragmentShaderSourceStr = fragmentShaderSource.c_str();
-    glShaderSource(fragmentShader, 1, &fragmentShaderSourceStr, nullptr);
-    glCompileShader(fragmentShader);
-
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(fragmentShader, 512, nullptr, infoLog);
-        spdlog::error("FragmentShader compile FAILED!{0}", infoLog);
-    }
-    else
-    {
-        spdlog::info("FragmentShader compile SUCCESS!");
-    }
-
-    unsigned int shaderProgram;
-    shaderProgram = glCreateProgram();
-
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        spdlog::error("ShaderProgram Link FAILED!{0}", infoLog);
-    }
-    else
-    {
-        spdlog::info("ShaderProgram Link Success!");
-    }
-
-    int uniColorLocation = glGetUniformLocation(shaderProgram, "uniColor");
-    int isUniformSetColorLocation = glGetUniformLocation(shaderProgram, "isUniformSetColor");
-
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    Shader triangleShader = Shader("assets/shaders/VertexShader.glsl", "assets/shaders/FragmentShader.glsl");
 
     float vertices[] =
     {
@@ -196,14 +112,14 @@ int main()
         {
             ImGui::Begin("Hello World!");
 
-            if (ImGui::ColorEdit3("background color", (float*)&clear_color))
+            if (ImGui::ColorEdit3("background color", (float*)&clearColor))
             {
-                spdlog::info("set background color:{0}, {1}, {2}", clear_color.x, clear_color.y, clear_color.z);
+                spdlog::info("set background color:{0}, {1}, {2}", clearColor.x, clearColor.y, clearColor.z);
             }
 
-            if (ImGui::ColorEdit4("triangle color", (float*)&triangle_color))
+            if (ImGui::ColorEdit4("triangle color", (float*)&triangleColor))
             {
-                spdlog::info("set triangle color:{0}, {1}, {2}, {3}", triangle_color.x, triangle_color.y, triangle_color.z, triangle_color.w);
+                spdlog::info("set triangle color:{0}, {1}, {2}, {3}", triangleColor.x, triangleColor.y, triangleColor.z, triangleColor.w);
             }
 
             ImGui::End();
@@ -211,11 +127,11 @@ int main()
 
         ImGui::Render();
 
-        glClearColor(clear_color.x, clear_color.y, clear_color.z, 1.0f);
+        glClearColor(clearColor.x, clearColor.y, clearColor.z, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(shaderProgram);
-        glUniform4f(uniColorLocation, triangle_color.x, triangle_color.y, triangle_color.z, triangle_color.w);
+        triangleShader.UseShader();
+        triangleShader.SetUniform4f("uniColor", triangleColor.x, triangleColor.y, triangleColor.z, triangleColor.w);
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
