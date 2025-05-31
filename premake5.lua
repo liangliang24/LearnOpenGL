@@ -21,6 +21,7 @@ IncludeDir["GLAD"]="vendor/glad/include"
 IncludeDir["glm"]="vendor/glm"
 IncludeDir["spdlog"]="vendor/spdlog/include"
 IncludeDir["ImGui"]="vendor/imgui"
+IncludeDir["stb_image"]="vendor/stb_image"
 
 include "vendor/glfw"
 include "vendor/glad"
@@ -38,7 +39,9 @@ project "LearnOpenGL"
     files
     {
         "src/**.h",
-        "src/**.cpp"
+        "src/**.cpp",
+        "%{IncludeDir.stb_image}/**.h",
+        "%{IncludeDir.stb_image}/**.cpp",
     }
 
     includedirs
@@ -48,7 +51,8 @@ project "LearnOpenGL"
         "%{IncludeDir.GLAD}",
         "%{IncludeDir.glm}",
         "%{IncludeDir.spdlog}",
-        "%{IncludeDir.ImGui}"
+        "%{IncludeDir.ImGui}",
+        "%{IncludeDir.stb_image}"
     }
 
     links

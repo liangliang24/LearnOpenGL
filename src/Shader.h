@@ -1,7 +1,8 @@
-#include <iostream>
-#include <fstream>
+#pragma once
 #include <spdlog/spdlog.h>
 #include <glad/glad.h>
+
+#include "FileLoader.h"
 
 class Shader
 {
@@ -10,13 +11,16 @@ public:
 	Shader(const char* vertexShaderFilepath, const char* fragmentShaderFilepath);
 	virtual ~Shader();
 
-	static std::string ReadFileAsString(const std::string& filepath);
 	int GetUniformLocation(std::string uniformName);
 	int GetUniformLocation(char* uniformName);
 	void SetUniform1f(char* uniformName, float x);
 	void SetUniform2f(char* uniformName, float x, float y);
 	void SetUniform3f(char* uniformName, float x, float y, float z);
 	void SetUniform4f(char* uniformName, float x, float y, float z, float w);
+	void SetUniform1i(char* uniformName, int x);
+	void SetUniform2i(char* uniformName, int x, int y);
+	void SetUniform3i(char* uniformName, int x, int y, int z);
+	void SetUniform4i(char* uniformName, int x, int y, int z, int w);
 	void UseShader();
 
 private:

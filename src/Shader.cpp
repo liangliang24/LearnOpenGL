@@ -9,12 +9,12 @@ Shader::Shader(const char* vertexShaderFilepath, const char* fragmentShaderFilep
 {
 	m_ShaderProgram = glCreateProgram();
 
-	std::string fragmentShaderSource = ReadFileAsString(fragmentShaderFilepath);
+	std::string fragmentShaderSource = FileLoader::ReadFileAsString(fragmentShaderFilepath);
 
 	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 
 	{
-		std::string vertexShaderSource = ReadFileAsString(vertexShaderFilepath);
+		std::string vertexShaderSource = FileLoader::ReadFileAsString(vertexShaderFilepath);
 		unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
 
 		const GLchar* vertexShaderSourceStr = vertexShaderSource.c_str();
@@ -39,7 +39,7 @@ Shader::Shader(const char* vertexShaderFilepath, const char* fragmentShaderFilep
 	}
 
 	{
-		std::string fragmentShaderSource = ReadFileAsString(fragmentShaderFilepath);
+		std::string fragmentShaderSource = FileLoader::ReadFileAsString(fragmentShaderFilepath);
 		unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 
 		const GLchar* fragmentShaderSourceStr = fragmentShaderSource.c_str();
@@ -84,26 +84,6 @@ Shader::~Shader()
 {
 }
 
-std::string Shader::ReadFileAsString(const std::string& filepath)
-{
-	std::string result;
-	std::ifstream in(filepath, std::ios::in | std::ios::binary);
-	if (in)
-	{
-		in.seekg(0, std::ios::end);
-		result.resize((size_t)in.tellg());
-		in.seekg(0, std::ios::beg);
-		in.read(&result[0], result.size());
-		in.close();
-	}
-	else
-	{
-		spdlog::error("Could not open file '{0}'", filepath);
-	}
-
-	return result;
-}
-
 int Shader::GetUniformLocation(std::string uniformName)
 {
 	return glGetUniformLocation(m_ShaderProgram, uniformName.c_str());
@@ -132,6 +112,26 @@ void Shader::SetUniform3f(char* uniformName, float x, float y, float z)
 void Shader::SetUniform4f(char* uniformName, float x, float y, float z, float w)
 {
 	glUniform4f(GetUniformLocation(uniformName), x, y, z, w);
+}
+
+void Shader::SetUniform1i(char* uniformName, int x)
+{
+	glUniform1i(GetUniformLocation(uniformName), x);
+}
+
+void Shader::SetUniform2i(char* uniformName, int x, int y)
+{
+	glUniform2i(GetUniformLocation(uniformName), x, y);
+}
+
+void Shader::SetUniform3i(char* uniformName, int x, int y, int z)
+{
+	glUniform3i(GetUniformLocation(uniformName), x, y, z);
+}
+
+void Shader::SetUniform4i(char* uniformName, int x, int y, int z, int w)
+{
+	glUniform4i(GetUniformLocation(uniformName), x, y, z, w);
 }
 
 void Shader::UseShader()

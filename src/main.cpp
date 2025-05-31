@@ -5,6 +5,7 @@
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
 #include "Shader.h"
+#include "Texture.h"
 
 #define WINDOW_WIDTH 1920
 #define WINDOW_HEIGHT 1080
@@ -64,16 +65,18 @@ int main()
     spdlog::info("Maximum nr of vertex attributes supported: {0}", nrAttributes);
 
     ImVec4 clearColor = ImVec4(0.2f, 0.3f, 0.3f, 1.0f);
-    ImVec4 triangleColor = ImVec4(0.7f, 0.1f, 0.1f, 1.0f);
+    ImVec4 triangleColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+    float textureMixLinear = 0.5f;
 
     Shader triangleShader = Shader("assets/shaders/VertexShader.glsl", "assets/shaders/FragmentShader.glsl");
-
+    Texture wallTexture = Texture("assets/textures/wall.jpg");
+    Texture awesomefaceTexture = Texture("assets/textures/awesomeface.png");
     float vertices[] =
     {
-        -0.5f,  -0.5f,  0.0f,
-        0.5f,   -0.5f,  0.0f,
-        0.5f,   0.5f,   0.0f,
-        -0.5f,  0.5f,   0.0f
+        -0.5f,  -0.5f,  0.0f,   0.0f,   0.0f,
+        0.5f,   -0.5f,  0.0f,   1.0f,   0.0f,
+        0.5f,   0.5f,   0.0f,   1.0f,   1.0f,
+        -0.5f,  0.5f,   0.0f,   0.0f,   1.0f
     };
 
     unsigned int indices[] =
@@ -94,12 +97,18 @@ int main()
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    triangleShader.UseShader();
+    triangleShader.SetUniform1i("u_Texture1", 0);
+    triangleShader.SetUniform1i("u_Texture2", 1);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -122,6 +131,8 @@ int main()
                 spdlog::info("set triangle color:{0}, {1}, {2}, {3}", triangleColor.x, triangleColor.y, triangleColor.z, triangleColor.w);
             }
 
+            ImGui::DragFloat("Texture Mix Linear", (float*)&textureMixLinear, 0.01f, 0.0f, 1.0f);
+
             ImGui::End();
         }
 
@@ -131,7 +142,10 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         triangleShader.UseShader();
-        triangleShader.SetUniform4f("uniColor", triangleColor.x, triangleColor.y, triangleColor.z, triangleColor.w);
+        triangleShader.SetUniform4f("u_Color", triangleColor.x, triangleColor.y, triangleColor.z, triangleColor.w);
+        triangleShader.SetUniform1f("u_TextureMixLinear", textureMixLinear);
+        wallTexture.ActiveTexture(GL_TEXTURE0);
+        awesomefaceTexture.ActiveTexture(GL_TEXTURE1);
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
