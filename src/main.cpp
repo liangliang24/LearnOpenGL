@@ -7,8 +7,20 @@
 #include "Shader.h"
 #include "Texture.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include <utility>
+#include <algorithm>
+
 #define WINDOW_WIDTH 1920
 #define WINDOW_HEIGHT 1080
+
+struct WindowData
+{
+    double xPos, yPos;
+}windowData;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -19,7 +31,10 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    {
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
         spdlog::info("press key escape");
+    }
 }
 
 int main()
@@ -49,7 +64,14 @@ int main()
 
     glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
+    glfwSetWindowUserPointer(window, &windowData);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xPos, double yPos)
+        {
+            windowData = *(WindowData*)glfwGetWindowUserPointer(window);
+            windowData.xPos = xPos;
+            windowData.yPos = yPos;
+        });
 
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -67,10 +89,34 @@ int main()
     ImVec4 clearColor = ImVec4(0.2f, 0.3f, 0.3f, 1.0f);
     ImVec4 triangleColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
     float textureMixLinear = 0.5f;
+    float translate[3] = { 0.0f, 0.0f, 0.0f };
+    float rotate[3] = { 0.0f, 0.0f, 0.0f };
+    float scale[3] = { 1.0f, 1.0f, 1.0f };
+    float fov = 45.0f;
+    float nearPlant = 0.1f;
+    float farPlant = 100.0f;
+    float cameraSpeed = 5.0f;
+    float cursorLastXPos = 0.0f;
+    float cursorLastYPos = 0.0f;
 
     Shader triangleShader = Shader("assets/shaders/VertexShader.glsl", "assets/shaders/FragmentShader.glsl");
     Texture wallTexture = Texture("assets/textures/wall.jpg");
     Texture awesomefaceTexture = Texture("assets/textures/awesomeface.png");
+
+    glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+
+    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 cameraDirection = glm::normalize(cameraTarget - cameraPos);
+
+    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+    glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
+
+    glm::vec3 cameraUp = glm::normalize(glm::cross(cameraDirection, cameraRight));
+
+    float cameraPitch = 0.0f;
+    float cameraYaw = -90.0f;
+    float mouseSensitivity = 0.05f;
+
     float vertices[] =
     {
         -0.5f,  -0.5f,  0.0f,   0.0f,   0.0f,
@@ -110,9 +156,26 @@ int main()
     triangleShader.SetUniform1i("u_Texture1", 0);
     triangleShader.SetUniform1i("u_Texture2", 1);
 
+    float lastFrame = 0.0f;
+    
+    glfwGetCursorPos(window, &windowData.xPos, &windowData.yPos);
+    cursorLastXPos = windowData.xPos;
+    cursorLastYPos = windowData.yPos;
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
+
+        float deltaTime = glfwGetTime() - lastFrame;
+        lastFrame = glfwGetTime();
+        
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            cameraPos += cameraSpeed * cameraDirection * deltaTime;
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            cameraPos -= glm::normalize(glm::cross(cameraDirection, cameraUp)) * cameraSpeed * deltaTime;
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            cameraPos -= cameraSpeed * cameraDirection * deltaTime;
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            cameraPos += glm::normalize(glm::cross(cameraDirection, cameraUp)) * cameraSpeed * deltaTime;
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -133,15 +196,54 @@ int main()
 
             ImGui::DragFloat("Texture Mix Linear", (float*)&textureMixLinear, 0.01f, 0.0f, 1.0f);
 
+            ImGui::DragFloat3("Translate", translate, 0.01f);
+            ImGui::DragFloat3("Rotate", rotate, 1.0f, -180.0f, 180.f);
+            ImGui::DragFloat3("Scale", scale, 0.01f);
+            ImGui::DragFloat("FOV",(float*)&fov);
+            ImGui::DragFloat("NearPlant", (float*)&nearPlant);
+            ImGui::DragFloat("FarPlant", (float*)&farPlant);
+            ImGui::DragFloat("Camera Speed", (float*)&cameraSpeed);
+            ImGui::DragFloat("Mouse Sensiticity", (float*)&mouseSensitivity);
+     
+            ImGui::Text("delta time:%.3f", deltaTime);
+            ImGui::Text("Camera Direction:%f, %f, %f", cameraDirection.x, cameraDirection.y, cameraDirection.z);
+            ImGui::Text("Camera Pitch:%f, Camera Yase:%.f", cameraPitch, cameraYaw);
+
             ImGui::End();
         }
 
         ImGui::Render();
+        float xOffset = windowData.xPos - cursorLastXPos;
+        float yOffset = cursorLastYPos - windowData.yPos;
+        cursorLastXPos = windowData.xPos;
+        cursorLastYPos = windowData.yPos;
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS)
+        {
+            cameraPitch += yOffset * mouseSensitivity;
+            cameraYaw += xOffset * mouseSensitivity;
+            if (cameraPitch > 89.0f) cameraPitch = 89.0f;
+            if (cameraPitch < -89.0f) cameraPitch = -89.0f;
+        }
 
         glClearColor(clearColor.x, clearColor.y, clearColor.z, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         triangleShader.UseShader();
+        glm::mat4 trans = glm::mat4(1.0f);
+        trans = glm::translate(trans, glm::vec3(translate[0], translate[1], translate[2]));
+        trans = glm::rotate(trans, glm::radians(rotate[0]), glm::vec3(1.0f, 0.0f, 0.0f));
+        trans = glm::rotate(trans, glm::radians(rotate[1]), glm::vec3(0.0f, 1.0f, 0.0f));
+        trans = glm::rotate(trans, glm::radians(rotate[2]), glm::vec3(0.0f, 0.0f, 1.0f));
+        trans = glm::scale(trans, glm::vec3(scale[0], scale[1], scale[2]));
+        cameraDirection.x = cos(glm::radians(cameraYaw)) * cos(glm::radians(cameraPitch));
+        cameraDirection.y = sin(glm::radians(cameraPitch));
+        cameraDirection.z = sin(glm::radians(cameraYaw)) * cos(glm::radians(cameraPitch));
+        cameraDirection = glm::normalize(cameraDirection);
+        glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraDirection, cameraUp);
+        glm::mat4 projection = glm::perspective(glm::radians(fov), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, nearPlant, farPlant);
+        triangleShader.SetUniformMatrix4fv("u_Transform", 1, GL_FALSE, glm::value_ptr(trans));
+        triangleShader.SetUniformMatrix4fv("u_View", 1, GL_FALSE, glm::value_ptr(view));
+        triangleShader.SetUniformMatrix4fv("u_Projection", 1, GL_FALSE, glm::value_ptr(projection));
         triangleShader.SetUniform4f("u_Color", triangleColor.x, triangleColor.y, triangleColor.z, triangleColor.w);
         triangleShader.SetUniform1f("u_TextureMixLinear", textureMixLinear);
         wallTexture.ActiveTexture(GL_TEXTURE0);

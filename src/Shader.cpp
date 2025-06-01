@@ -134,6 +134,11 @@ void Shader::SetUniform4i(char* uniformName, int x, int y, int z, int w)
 	glUniform4i(GetUniformLocation(uniformName), x, y, z, w);
 }
 
+void Shader::SetUniformMatrix4fv(char* uniformName, int matSize, bool transpose, const float* trans)
+{
+	glUniformMatrix4fv(GetUniformLocation(uniformName), matSize, transpose, trans);
+}
+
 void Shader::UseShader()
 {
 	glUseProgram(m_ShaderProgram);
