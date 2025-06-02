@@ -1,6 +1,28 @@
-#include <glad/glad.h>
+#include "pch.h"
+
+#include "Application.h"
+#include "ExampleLayer.h"
+
+class Example :public LearnOpenGL::Application
+{
+public:
+    Example()
+        : Application()
+    {
+        PushLayer(new ExampleLayer("Example"));
+    }
+    virtual ~Example() = default;
+};
+
+int main()
+{
+    std::shared_ptr<LearnOpenGL::Application> app = std::make_shared<Example>();
+    app->Run();
+    return 0;
+}
+
+/*
 #include <GLFW/glfw3.h>
-#include <spdlog/spdlog.h>
 #include "imgui.h"
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
@@ -14,9 +36,6 @@
 #include <utility>
 #include <algorithm>
 
-#define WINDOW_WIDTH 1920
-#define WINDOW_HEIGHT 1080
-
 struct WindowData
 {
     double xPos, yPos;
@@ -25,7 +44,7 @@ struct WindowData
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
-    spdlog::info("resize width:{0}£¬ height:{1}", width, height);
+    spdlog::info("resize width:{0}ï¿½ï¿½ height:{1}", width, height);
 }
 
 void processInput(GLFWwindow* window)
@@ -43,7 +62,7 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
     GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "LearningOpenGL", NULL, NULL);
     if (window == NULL)
@@ -99,9 +118,9 @@ int main()
     float cursorLastXPos = 0.0f;
     float cursorLastYPos = 0.0f;
 
-    Shader triangleShader = Shader("assets/shaders/VertexShader.glsl", "assets/shaders/FragmentShader.glsl");
-    Texture wallTexture = Texture("assets/textures/wall.jpg");
-    Texture awesomefaceTexture = Texture("assets/textures/awesomeface.png");
+    LearnOpenGL::Shader triangleShader = LearnOpenGL::Shader("assets/shaders/VertexShader.glsl", "assets/shaders/FragmentShader.glsl");
+    LearnOpenGL::Texture wallTexture = LearnOpenGL::Texture("assets/textures/wall.jpg");
+    LearnOpenGL::Texture awesomefaceTexture = LearnOpenGL::Texture("assets/textures/awesomeface.png");
 
     glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 
@@ -269,3 +288,4 @@ int main()
     glfwTerminate();
 	return 0;
 }
+*/

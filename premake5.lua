@@ -1,6 +1,6 @@
 workspace "LearnOpenGL"
     architecture "x64"
-    startproject "LearnOpenGL"
+    startproject "Example"
 
     configurations
     {
@@ -23,60 +23,9 @@ IncludeDir["spdlog"]="vendor/spdlog/include"
 IncludeDir["ImGui"]="vendor/imgui"
 IncludeDir["stb_image"]="vendor/stb_image"
 
-include "vendor/glfw"
-include "vendor/glad"
-include "vendor/imgui"
+include "core/vendor/glfw"
+include "core/vendor/glad"
+include "core/vendor/imgui"
 
-project "LearnOpenGL"
-    kind "ConsoleApp"
-    language "C++"
-    cppdialect "C++17"
-    staticruntime "on"
-
-    targetdir ("bin/"..outputdir.."/%{prj.name}")
-    objdir ("bin-int/"..outputdir.."/%{prj.name}")
-
-    files
-    {
-        "src/**.h",
-        "src/**.cpp",
-        "%{IncludeDir.stb_image}/**.h",
-        "%{IncludeDir.stb_image}/**.cpp",
-    }
-
-    includedirs
-    {
-        "src",
-        "%{IncludeDir.GLFW}",
-        "%{IncludeDir.GLAD}",
-        "%{IncludeDir.glm}",
-        "%{IncludeDir.spdlog}",
-        "%{IncludeDir.ImGui}",
-        "%{IncludeDir.stb_image}"
-    }
-
-    links
-    {
-        "GLFW",
-        "opengl32.lib",
-        "GLAD",
-        "ImGui"
-    }
-
-    defines
-    {
-        "FMT_UNICODE=0"
-    }
-
-    filter "system:windows"
-		systemversion "latest"
-
-	filter "configurations:Debug"
-		defines "DEBUG"
-		runtime "Debug"
-		symbols "on"
-
-	filter "configurations:Release"
-		defines "RELEASE"
-		runtime "Release"
-		optimize "on"
+include "core"
+include "example"
