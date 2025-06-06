@@ -31,12 +31,13 @@ private:
 	unsigned int m_LightEBO, m_LightVBO, m_LightVAO;
 	LearnOpenGL::Shader m_LightShader;
 	float m_LightColor[3] =		{ 1.0f, 1.0f, 1.0f };
-	float m_LightTranslate[3] = { 1.0f, 1.0f, 1.0f };
+	float m_LightTranslate[3] = { 0.0f, 0.7f, 0.5f };
 	float m_LightRotate[3] =	{ 0.0f, 0.0f, 0.0f };
 	float m_LightScale[3] =		{ 0.1f, 0.1f, 0.1f };
 
 	float m_AmbientStrength = 0.5f;
 	float m_SpecularStrength = 0.5f;
+	int m_Shininess = 256;
 
 	LearnOpenGL::CameraController m_CameraController;
 };

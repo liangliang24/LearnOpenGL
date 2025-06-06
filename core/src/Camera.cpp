@@ -33,6 +33,20 @@ namespace LearnOpenGL
 		UpdateProjectionMatrix();
 	}
 
+	Camera::Camera(const glm::vec3& cameraPos, const float pitch)
+		: m_CameraPos(cameraPos),
+		m_CameraUp(glm::vec3(0.0f, 1.0f, 0.0f)),
+		m_CameraPitch(pitch),
+		m_CameraYaw(-90.0f),
+		m_FOV(45.0f),
+		m_NearPlant(0.1f),
+		m_FarPlant(100.0f)
+	{
+		UpdateCameraDirection();
+		UpdateViewMatrix();
+		UpdateProjectionMatrix();
+	}
+
 	Camera::~Camera()
 	{
 	}

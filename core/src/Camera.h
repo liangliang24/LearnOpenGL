@@ -11,6 +11,7 @@ namespace LearnOpenGL
 	public:
 		Camera();
 		Camera(const glm::vec3& cameraPos);
+		Camera(const glm::vec3& cameraPos, const float pitch);
 		~Camera();
 
 		float GetFOV() { return m_FOV; }

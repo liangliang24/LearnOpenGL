@@ -404,6 +404,8 @@ core/bin/*
 core/bin-int/*
 example/bin/*
 example/bin-int/*
+light/bin/*
+light/bin-int/*
 *.vcxproj
 *.filters
 vendor/glad/bin/*

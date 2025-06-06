@@ -10,6 +10,7 @@ uniform float u_AmbientStrength;
 uniform vec3 u_LightPos;
 uniform vec3 u_CameraPos;
 uniform float u_SpecularStrength;
+uniform int u_Shininess;
 
 void main()
 {
@@ -20,8 +21,8 @@ void main()
 	vec3 diffuse = max(dot(norm, lightDir), 0.0) * u_LightColor;
 
 	vec3 viewDir = normalize(u_CameraPos - FragPos);
-	vec3 reflectDir = reflect(-lightDir, norm);
-	vec3 specular = u_SpecularStrength * pow(max(dot(viewDir, reflectDir), 0.0), 256) * u_LightColor;
+	vec3 halfwayDir = normalize(lightDir + viewDir);
+	vec3 specular = u_SpecularStrength * pow(max(dot(norm, halfwayDir), 0.0), u_Shininess) * u_LightColor;
 
 	vec3 result = (ambient + diffuse + specular) * u_Color;
 	FragColor = vec4(result, 1.0f);

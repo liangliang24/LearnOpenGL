@@ -15,7 +15,7 @@
 
 LightLayer::LightLayer(const std::string& debugName)
     : Layer(debugName),
-    m_CameraController(LearnOpenGL::CameraController(glm::vec3(0.0f, 0.0f, 3.0f)))
+    m_CameraController(LearnOpenGL::CameraController(glm::vec3(0.0f, 2.0f, 3.0f), -30.0f))
 {
 }
 
@@ -232,6 +232,7 @@ void LightLayer::OnImguiRender()
 
 	ImGui::DragFloat("Ambient strength", &m_AmbientStrength);
 	ImGui::DragFloat("Specular strength", &m_SpecularStrength);
+	ImGui::DragInt("Shininess", &m_Shininess, 1, 0);
 	
 
     ImGuiIO& io = ImGui::GetIO();
@@ -266,6 +267,7 @@ void LightLayer::OnUpdate(const LearnOpenGL::Timestep& timestep)
 		m_CubeShader.SetUniform3f("u_LightColor", m_LightColor[0], m_LightColor[1], m_LightColor[2]);
 		m_CubeShader.SetUniform1f("u_AmbientStrength", m_AmbientStrength);
 		m_CubeShader.SetUniform1f("u_SpecularStrength", m_SpecularStrength);
+		m_CubeShader.SetUniform1i("u_Shininess", m_Shininess);
 		m_CubeShader.SetUniform3f("u_LightPos", m_LightTranslate[0], m_LightTranslate[1], m_LightTranslate[2]);
 		glm::vec3 cameraPos = m_CameraController.GetCamera().GetCameraPos();
 		m_CubeShader.SetUniform3f("u_CameraPos", cameraPos.x, cameraPos.y, cameraPos.z);
