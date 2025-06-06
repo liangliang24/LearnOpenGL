@@ -40,35 +40,35 @@ void LightLayer::OnAttach()
 
 		float vertices[] =
 		{
-			-0.5f,  -0.5f,  0.0f,   0.0f,   0.0f,
-			0.5f,   -0.5f,  0.0f,   1.0f,   0.0f,
-			0.5f,   0.5f,   0.0f,   1.0f,   1.0f,
-			-0.5f,  0.5f,   0.0f,   0.0f,   1.0f,
+			-0.5f,  -0.5f,  0.0f,   0.0f,   0.0f,	-1.0f,
+			0.5f,   -0.5f,  0.0f,   0.0f,   0.0f,	-1.0f,
+			0.5f,   0.5f,   0.0f,   0.0f,   0.0f,	-1.0f,
+			-0.5f,  0.5f,   0.0f,   0.0f,   0.0f,	-1.0f,
 
-			-0.5f,  -0.5f,  1.0f,   0.0f,   0.0f,
-			0.5f,   -0.5f,  1.0f,   1.0f,   0.0f,
-			0.5f,   0.5f,   1.0f,   1.0f,   1.0f,
-			-0.5f,  0.5f,   1.0f,   0.0f,   1.0f,
+			-0.5f,  -0.5f,  1.0f,   0.0f,   0.0f,	1.0f,
+			0.5f,   -0.5f,  1.0f,   0.0f,   0.0f,	1.0f,
+			0.5f,   0.5f,   1.0f,   0.0f,   0.0f,	1.0f,
+			-0.5f,  0.5f,   1.0f,   0.0f,   0.0f,	1.0f,
 
-			-0.5f,  -0.5f,  0.0f,   0.0f,   0.0f,
-			0.5f,   -0.5f,  0.0f,   1.0f,   0.0f,
-			0.5f,  -0.5f,   1.0f,   1.0f,   1.0f,
-			-0.5f,  -0.5f,  1.0f,   0.0f,   1.0f,
+			-0.5f,  -0.5f,  0.0f,   0.0f,   -1.0f,	0.0f,
+			0.5f,   -0.5f,  0.0f,   0.0f,   -1.0f,	0.0f,
+			0.5f,  -0.5f,   1.0f,   0.0f,   -1.0f,	0.0f,
+			-0.5f,  -0.5f,  1.0f,   0.0f,   -1.0f,	0.0f,
 
-			-0.5f,  0.5f,   0.0f,   0.0f,   0.0f,
-			0.5f,   0.5f,   0.0f,   1.0f,   0.0f,
-			0.5f,   0.5f,   1.0f,   1.0f,   1.0f,
-			-0.5f,  0.5f,   1.0f,   0.0f,   1.0f,
+			-0.5f,  0.5f,   0.0f,   0.0f,   1.0f,	0.0f,
+			0.5f,   0.5f,   0.0f,   0.0f,   1.0f,	0.0f,
+			0.5f,   0.5f,   1.0f,   0.0f,   1.0f,	0.0f,
+			-0.5f,  0.5f,   1.0f,   0.0f,   1.0f,	0.0f,
 
-			-0.5f,  -0.5f,  0.0f,   0.0f,   0.0f,
-			-0.5f,  0.5f,   0.0f,   1.0f,   0.0f,
-			-0.5f,  0.5f,   1.0f,   1.0f,   1.0f,
-			-0.5f,  -0.5f,  1.0f,   0.0f,   1.0f,
+			-0.5f,  -0.5f,  0.0f,   -1.0f,   0.0f,	0.0f,
+			-0.5f,  0.5f,   0.0f,   -1.0f,   0.0f,	0.0f,
+			-0.5f,  0.5f,   1.0f,   -1.0f,   0.0f,	0.0f,
+			-0.5f,  -0.5f,  1.0f,   -1.0f,   0.0f,	0.0f,
 
-			0.5f,  -0.5f,   0.0f,   0.0f,   0.0f,
-			0.5f,   0.5f,   0.0f,   1.0f,   0.0f,
-			0.5f,   0.5f,   1.0f,   1.0f,   1.0f,
-			0.5f,  -0.5f,   1.0f,   0.0f,   1.0f
+			0.5f,  -0.5f,   0.0f,   1.0f,   0.0f,	0.0f,
+			0.5f,   0.5f,   0.0f,   1.0f,   0.0f,	0.0f,
+			0.5f,   0.5f,   1.0f,   1.0f,   0.0f,	0.0f,
+			0.5f,  -0.5f,   1.0f,   1.0f,   0.0f,	0.0f
 		};
 
 		unsigned int indices[] =
@@ -104,8 +104,10 @@ void LightLayer::OnAttach()
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+		glEnableVertexAttribArray(1);
 
 		glBindVertexArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -228,6 +230,10 @@ void LightLayer::OnImguiRender()
     ImGui::DragFloat("Mouse Sensiticity", (float*)&sensitivity);
     m_CameraController.SetMouseSensitivity(sensitivity);
 
+	ImGui::DragFloat("Ambient strength", &m_AmbientStrength);
+	ImGui::DragFloat("Specular strength", &m_SpecularStrength);
+	
+
     ImGuiIO& io = ImGui::GetIO();
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 
@@ -256,8 +262,13 @@ void LightLayer::OnUpdate(const LearnOpenGL::Timestep& timestep)
 		m_CubeShader.SetUniformMatrix4fv("u_Transform", 1, GL_FALSE, glm::value_ptr(trans));
 		m_CubeShader.SetUniformMatrix4fv("u_View", 1, GL_FALSE, glm::value_ptr(m_CameraController.GetCamera().GetViewMatrix()));
 		m_CubeShader.SetUniformMatrix4fv("u_Projection", 1, GL_FALSE, glm::value_ptr(m_CameraController.GetCamera().GetProjectionMatrix()));
-		m_CubeShader.SetUniform4f("u_Color", m_CubeColor[0], m_CubeColor[1], m_CubeColor[2], 1.0f);
-		m_CubeShader.SetUniform4f("u_LightColor", m_LightColor[0], m_LightColor[1], m_LightColor[2], 1.0f);
+		m_CubeShader.SetUniform3f("u_Color", m_CubeColor[0], m_CubeColor[1], m_CubeColor[2]);
+		m_CubeShader.SetUniform3f("u_LightColor", m_LightColor[0], m_LightColor[1], m_LightColor[2]);
+		m_CubeShader.SetUniform1f("u_AmbientStrength", m_AmbientStrength);
+		m_CubeShader.SetUniform1f("u_SpecularStrength", m_SpecularStrength);
+		m_CubeShader.SetUniform3f("u_LightPos", m_LightTranslate[0], m_LightTranslate[1], m_LightTranslate[2]);
+		glm::vec3 cameraPos = m_CameraController.GetCamera().GetCameraPos();
+		m_CubeShader.SetUniform3f("u_CameraPos", cameraPos.x, cameraPos.y, cameraPos.z);
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 	}

@@ -19,7 +19,7 @@ public:
 	void OnUpdate(const LearnOpenGL::Timestep& timestep) override;
 	void OnEvent(LearnOpenGL::Event& event) override;
 private:
-	float m_ClearColor[3] = { 0.0f, 1.0f, 0.8f };
+	float m_ClearColor[3] = { 0.0f, 0.0f, 0.0f };
 
 	unsigned int m_CubeEBO, m_CubeVBO, m_CubeVAO;
 	LearnOpenGL::Shader m_CubeShader;
@@ -34,6 +34,9 @@ private:
 	float m_LightTranslate[3] = { 1.0f, 1.0f, 1.0f };
 	float m_LightRotate[3] =	{ 0.0f, 0.0f, 0.0f };
 	float m_LightScale[3] =		{ 0.1f, 0.1f, 0.1f };
+
+	float m_AmbientStrength = 0.5f;
+	float m_SpecularStrength = 0.5f;
 
 	LearnOpenGL::CameraController m_CameraController;
 };
