@@ -8,6 +8,11 @@
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
 
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 ExampleLayer::ExampleLayer(const std::string& debugName)
     : Layer(debugName),
     m_TextureMixLinear(0.5f),
@@ -38,14 +43,56 @@ void ExampleLayer::OnAttach()
         -0.5f,  -0.5f,  0.0f,   0.0f,   0.0f,
         0.5f,   -0.5f,  0.0f,   1.0f,   0.0f,
         0.5f,   0.5f,   0.0f,   1.0f,   1.0f,
-        -0.5f,  0.5f,   0.0f,   0.0f,   1.0f
+        -0.5f,  0.5f,   0.0f,   0.0f,   1.0f,
+
+		-0.5f,  -0.5f,  1.0f,   0.0f,   0.0f,
+		0.5f,   -0.5f,  1.0f,   1.0f,   0.0f,
+		0.5f,   0.5f,   1.0f,   1.0f,   1.0f,
+		-0.5f,  0.5f,   1.0f,   0.0f,   1.0f,
+
+		-0.5f,  -0.5f,  0.0f,   0.0f,   0.0f,
+		0.5f,   -0.5f,  0.0f,   1.0f,   0.0f,
+		0.5f,  -0.5f,   1.0f,   1.0f,   1.0f,
+		-0.5f,  -0.5f,  1.0f,   0.0f,   1.0f,
+
+		-0.5f,  0.5f,   0.0f,   0.0f,   0.0f,
+		0.5f,   0.5f,   0.0f,   1.0f,   0.0f,
+		0.5f,   0.5f,   1.0f,   1.0f,   1.0f,
+		-0.5f,  0.5f,   1.0f,   0.0f,   1.0f,
+
+		-0.5f,  -0.5f,  0.0f,   0.0f,   0.0f,
+	    -0.5f,  0.5f,   0.0f,   1.0f,   0.0f,
+		-0.5f,  0.5f,   1.0f,   1.0f,   1.0f,
+		-0.5f,  -0.5f,  1.0f,   0.0f,   1.0f,
+
+		0.5f,  -0.5f,   0.0f,   0.0f,   0.0f,
+		0.5f,   0.5f,   0.0f,   1.0f,   0.0f,
+		0.5f,   0.5f,   1.0f,   1.0f,   1.0f,
+		0.5f,  -0.5f,   1.0f,   0.0f,   1.0f
     };
 
     unsigned int indices[] =
     {
         0,  1,  3,
-        1,  2,  3
+        1,  2,  3,
+
+        4,  5,  7,
+        5,  6,  7,
+
+        8,  9,  11,
+        9,  10, 11,
+
+        12, 13, 15,
+        13, 14, 15,
+
+        16, 17, 19,
+        17, 18, 19,
+
+        20, 21, 23,
+        21, 22, 23,
     };
+
+    glEnable(GL_DEPTH_TEST);
 
     glGenBuffers(1, &m_VBO);
     glGenVertexArrays(1, &m_VAO);
@@ -93,7 +140,7 @@ void ExampleLayer::OnImguiRender()
     ImGui::DragFloat3("Scale", m_Scale, 0.01f);
 
     float cameraSpeed = m_CameraController.GetCameraSpeed();
-    ImGui::DragFloat("C<amera Speed", (float*)&cameraSpeed);
+    ImGui::DragFloat("Camera Speed", (float*)&cameraSpeed);
     m_CameraController.SetCameraSpeed(cameraSpeed);
 
     float sensitivity = m_CameraController.GetMouseSensitivity();
@@ -113,7 +160,7 @@ void ExampleLayer::OnUpdate(const LearnOpenGL::Timestep& timestep)
     m_CameraController.OnUpdate(timestep);
 
     glClearColor(m_ClearColor[0], m_ClearColor[1], m_ClearColor[2], 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     m_TriangleShader.UseShader();
     glm::mat4 trans = glm::mat4(1.0f);
@@ -131,7 +178,7 @@ void ExampleLayer::OnUpdate(const LearnOpenGL::Timestep& timestep)
     m_WallTexture.ActiveTexture(GL_TEXTURE0);
     m_AwesomefaceTexture.ActiveTexture(GL_TEXTURE1);
     glBindVertexArray(m_VAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
 }

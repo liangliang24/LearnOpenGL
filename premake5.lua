@@ -29,3 +29,4 @@ include "core/vendor/imgui"
 
 include "core"
 include "example"
+include "light"

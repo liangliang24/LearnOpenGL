@@ -4,10 +4,6 @@
 #include <Shader.h>
 #include <Texture.h>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
 #include "CameraController.h"
 #include "Event/ApplicationEvent.h"
 
@@ -27,7 +23,7 @@ private:
 	unsigned int m_EBO, m_VBO, m_VAO;
 	LearnOpenGL::Texture m_WallTexture;
 	LearnOpenGL::Texture m_AwesomefaceTexture;
-	float m_ClearColor[3] = { 0.0f, 0.0f, 0.0f };
+	float m_ClearColor[3] = { 0.0f, 1.0f, 0.8f };
 	float m_TriangleColor[3] = { 1.0f, 1.0f, 1.0f };
 	float m_TextureMixLinear;
 	float m_Translate[3] = { 0.0f, 0.0f, 0.0f };
