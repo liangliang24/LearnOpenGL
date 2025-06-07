@@ -9,14 +9,26 @@
 #include "backends/imgui_impl_opengl3.h"
 
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 LightLayer::LightLayer(const std::string& debugName)
     : Layer(debugName),
     m_CameraController(LearnOpenGL::CameraController(glm::vec3(0.0f, 2.0f, 3.0f), -30.0f))
 {
+	m_CubeMaterial.ambient[0] = 0.24f;
+	m_CubeMaterial.ambient[1] = 0.19f;
+	m_CubeMaterial.ambient[2] = 0.07f;
+
+	m_CubeMaterial.diffuse[0] = 0.75f;
+	m_CubeMaterial.diffuse[1] = 0.6f;
+	m_CubeMaterial.diffuse[2] = 0.22f;
+
+	m_CubeMaterial.specular[0] = 0.62f;
+	m_CubeMaterial.specular[1] = 0.55f;
+	m_CubeMaterial.specular[2] = 0.36f;
+
+	m_LightMaterial.ambientStrength = 0.1f;
+	m_LightMaterial.diffuseStrength = 0.5f;
+	m_LightMaterial.specularStrength = 1.0f;
 }
 
 void LightLayer::OnAttach()
@@ -207,19 +219,113 @@ void LightLayer::OnImguiRender()
 
 	if (ImGui::CollapsingHeader("Cube"))
 	{
+		ImGui::SeparatorText("Basic property");
+
 		ImGui::ColorEdit3("Cube color", m_CubeColor);
 		ImGui::DragFloat3("Cube Translate", m_CubeTranslate, 0.01f);
 		ImGui::DragFloat3("Cube Rotate", m_CubeRotate, 1.0f, -180.0f, 180.f);
 		ImGui::DragFloat3("Cube Scale", m_CubeScale, 0.01f);
 
+		ImGui::SeparatorText("Material");
+
+		ImGui::DragFloat3("Cube ambient", m_CubeMaterial.ambient, 0.01f, 0.0f, 1.0f);
+		ImGui::DragFloat3("Cube diffuse", m_CubeMaterial.diffuse, 0.01f, 0.0f, 1.0f);
+		ImGui::DragFloat3("Cube specular", m_CubeMaterial.specular, 0.01f, 0.0f, 1.0f);
+		ImGui::DragInt("Cube shininess", &m_CubeMaterial.shininess, 1, 32, 2048);
+
+		ImGui::SeparatorText("Preset material");
+		
+		const char* presetMaterialName[] =
+		{
+			"gold",
+			"pearl",
+			"red plastic"
+		};
+		static int presetMaterialIdx = 1;
+
+		const char* presetMaterialValue = presetMaterialName[presetMaterialIdx];
+
+		if (ImGui::BeginCombo("Preset material combo", presetMaterialValue))
+		{
+			for (int i = 0; i < IM_ARRAYSIZE(presetMaterialName); ++i)
+			{
+				const bool isSelected = (presetMaterialIdx == i);
+				if (ImGui::Selectable(presetMaterialName[i], isSelected))
+				{
+					presetMaterialIdx = i;
+				}
+
+				if (isSelected)
+				{
+					ImGui::SetItemDefaultFocus();
+				}
+			}
+			ImGui::EndCombo();
+		}
+
+		switch (presetMaterialIdx)
+		{
+		case 0:
+			m_CubeMaterial.ambient[0] = 0.24f;
+			m_CubeMaterial.ambient[1] = 0.19f;
+			m_CubeMaterial.ambient[2] = 0.07f;
+
+			m_CubeMaterial.diffuse[0] = 0.75f;
+			m_CubeMaterial.diffuse[1] = 0.6f;
+			m_CubeMaterial.diffuse[2] = 0.22f;
+
+			m_CubeMaterial.specular[0] = 0.62f;
+			m_CubeMaterial.specular[1] = 0.55f;
+			m_CubeMaterial.specular[2] = 0.36f;
+
+			m_CubeMaterial.shininess = 51;
+			break;
+		case 1:
+			m_CubeMaterial.ambient[0] = 0.25f;
+			m_CubeMaterial.ambient[1] = 0.20f;
+			m_CubeMaterial.ambient[2] = 0.207f;
+
+			m_CubeMaterial.diffuse[0] = 1.0f;
+			m_CubeMaterial.diffuse[1] = 0.83f;
+			m_CubeMaterial.diffuse[2] = 0.83f;
+
+			m_CubeMaterial.specular[0] = 0.3f;
+			m_CubeMaterial.specular[1] = 0.3f;
+			m_CubeMaterial.specular[2] = 0.3f;
+
+			m_CubeMaterial.shininess = 113;
+			break;
+		case 2:
+			m_CubeMaterial.ambient[0] = 0.0f;
+			m_CubeMaterial.ambient[1] = 0.0f;
+			m_CubeMaterial.ambient[2] = 0.0f;
+
+			m_CubeMaterial.diffuse[0] = 0.5f;
+			m_CubeMaterial.diffuse[1] = 0.0f;
+			m_CubeMaterial.diffuse[2] = 0.0f;
+
+			m_CubeMaterial.specular[0] = 0.7f;
+			m_CubeMaterial.specular[1] = 0.6f;
+			m_CubeMaterial.specular[2] = 0.6f;
+
+			m_CubeMaterial.shininess = 32;
+			break;
+		}
 	}
 
 	if (ImGui::CollapsingHeader("Light"))
 	{
+		ImGui::SeparatorText("Basic property");
+
 		ImGui::ColorEdit3("Light color", m_LightColor);
 		ImGui::DragFloat3("Light Translate", m_LightTranslate, 0.01f);
 		ImGui::DragFloat3("Light Rotate", m_LightRotate, 1.0f, -180.0f, 180.f);
 		ImGui::DragFloat3("Light Scale", m_LightScale, 0.01f);
+
+		ImGui::SeparatorText("Material");
+		ImGui::DragFloat("Light ambient", &m_LightMaterial.ambientStrength, 0.01f, 0.0f, 1.0f);
+		ImGui::DragFloat("Light diffuse", &m_LightMaterial.diffuseStrength, 0.01f, 0.0f, 1.0f);
+		ImGui::DragFloat("Light specular", &m_LightMaterial.specularStrength, 0.01f, 0.0f, 1.0f);
 	}
    
     float cameraSpeed = m_CameraController.GetCameraSpeed();
@@ -229,10 +335,6 @@ void LightLayer::OnImguiRender()
     float sensitivity = m_CameraController.GetMouseSensitivity();
     ImGui::DragFloat("Mouse Sensiticity", (float*)&sensitivity);
     m_CameraController.SetMouseSensitivity(sensitivity);
-
-	ImGui::DragFloat("Ambient strength", &m_AmbientStrength);
-	ImGui::DragFloat("Specular strength", &m_SpecularStrength);
-	ImGui::DragInt("Shininess", &m_Shininess, 1, 0);
 	
 
     ImGuiIO& io = ImGui::GetIO();
@@ -265,10 +367,14 @@ void LightLayer::OnUpdate(const LearnOpenGL::Timestep& timestep)
 		m_CubeShader.SetUniformMatrix4fv("u_Projection", 1, GL_FALSE, glm::value_ptr(m_CameraController.GetCamera().GetProjectionMatrix()));
 		m_CubeShader.SetUniform3f("u_Color", m_CubeColor[0], m_CubeColor[1], m_CubeColor[2]);
 		m_CubeShader.SetUniform3f("u_LightColor", m_LightColor[0], m_LightColor[1], m_LightColor[2]);
-		m_CubeShader.SetUniform1f("u_AmbientStrength", m_AmbientStrength);
-		m_CubeShader.SetUniform1f("u_SpecularStrength", m_SpecularStrength);
-		m_CubeShader.SetUniform1i("u_Shininess", m_Shininess);
-		m_CubeShader.SetUniform3f("u_LightPos", m_LightTranslate[0], m_LightTranslate[1], m_LightTranslate[2]);
+		m_CubeShader.SetUniform3f("u_Material.ambient", m_CubeMaterial.ambient[0], m_CubeMaterial.ambient[1], m_CubeMaterial.ambient[2]);
+		m_CubeShader.SetUniform3f("u_Material.diffuse", m_CubeMaterial.diffuse[0], m_CubeMaterial.diffuse[1], m_CubeMaterial.diffuse[2]);
+		m_CubeShader.SetUniform3f("u_Material.specular", m_CubeMaterial.specular[0], m_CubeMaterial.specular[1], m_CubeMaterial.specular[2]);
+		m_CubeShader.SetUniform1i("u_Material.shininess", m_CubeMaterial.shininess);
+		m_CubeShader.SetUniform3f("u_Light.position", m_LightTranslate[0], m_LightTranslate[1], m_LightTranslate[2]);
+		m_CubeShader.SetUniform1f("u_Light.ambient", m_LightMaterial.ambientStrength);
+		m_CubeShader.SetUniform1f("u_Light.diffuse", m_LightMaterial.diffuseStrength);
+		m_CubeShader.SetUniform1f("u_Light.specular", m_LightMaterial.specularStrength);
 		glm::vec3 cameraPos = m_CameraController.GetCamera().GetCameraPos();
 		m_CubeShader.SetUniform3f("u_CameraPos", cameraPos.x, cameraPos.y, cameraPos.z);
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);

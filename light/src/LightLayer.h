@@ -7,6 +7,10 @@
 #include "CameraController.h"
 #include "Event/ApplicationEvent.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 class LightLayer :public LearnOpenGL::Layer
 {
 public:
@@ -35,9 +39,24 @@ private:
 	float m_LightRotate[3] =	{ 0.0f, 0.0f, 0.0f };
 	float m_LightScale[3] =		{ 0.1f, 0.1f, 0.1f };
 
-	float m_AmbientStrength = 0.5f;
-	float m_SpecularStrength = 0.5f;
-	int m_Shininess = 256;
+	struct Material
+	{
+		float ambient[3];
+		float diffuse[3];
+		float specular[3];
+		int shininess = 256;
+	};
+
+	Material m_CubeMaterial;
+
+	struct LightMaterial
+	{
+		float ambientStrength;
+		float diffuseStrength;
+		float specularStrength;
+	};
+
+	LightMaterial m_LightMaterial;
 
 	LearnOpenGL::CameraController m_CameraController;
 };
