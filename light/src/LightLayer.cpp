@@ -14,18 +14,6 @@ LightLayer::LightLayer(const std::string& debugName)
     : Layer(debugName),
     m_CameraController(LearnOpenGL::CameraController(glm::vec3(0.0f, 2.0f, 3.0f), -30.0f))
 {
-	m_CubeMaterial.ambient[0] = 0.24f;
-	m_CubeMaterial.ambient[1] = 0.19f;
-	m_CubeMaterial.ambient[2] = 0.07f;
-
-	m_CubeMaterial.diffuse[0] = 0.75f;
-	m_CubeMaterial.diffuse[1] = 0.6f;
-	m_CubeMaterial.diffuse[2] = 0.22f;
-
-	m_CubeMaterial.specular[0] = 0.62f;
-	m_CubeMaterial.specular[1] = 0.55f;
-	m_CubeMaterial.specular[2] = 0.36f;
-
 	m_LightMaterial.ambientStrength = 0.1f;
 	m_LightMaterial.diffuseStrength = 0.5f;
 	m_LightMaterial.specularStrength = 1.0f;
@@ -49,38 +37,39 @@ void LightLayer::OnAttach()
 	{
 
 		m_CubeShader = LearnOpenGL::Shader("assets/shaders/VertexShader.glsl", "assets/shaders/FragmentShader.glsl");
-
+		m_CubeDiffuseTexture = LearnOpenGL::Texture("assets/textures/DiffuseTexture.png");
+		m_CubeSpecularTexture= LearnOpenGL::Texture("assets/textures/SpecularTexture.png");
 		float vertices[] =
 		{
-			-0.5f,  -0.5f,  0.0f,   0.0f,   0.0f,	-1.0f,
-			0.5f,   -0.5f,  0.0f,   0.0f,   0.0f,	-1.0f,
-			0.5f,   0.5f,   0.0f,   0.0f,   0.0f,	-1.0f,
-			-0.5f,  0.5f,   0.0f,   0.0f,   0.0f,	-1.0f,
+			-0.5f,  -0.5f,  0.0f,   0.0f,   0.0f,	-1.0f,   0.0f,   0.0f,
+			0.5f,   -0.5f,  0.0f,   0.0f,   0.0f,	-1.0f,   1.0f,   0.0f,
+			0.5f,   0.5f,   0.0f,   0.0f,   0.0f,	-1.0f,   1.0f,   1.0f,
+			-0.5f,  0.5f,   0.0f,   0.0f,   0.0f,	-1.0f,   0.0f,   1.0f,
 
-			-0.5f,  -0.5f,  1.0f,   0.0f,   0.0f,	1.0f,
-			0.5f,   -0.5f,  1.0f,   0.0f,   0.0f,	1.0f,
-			0.5f,   0.5f,   1.0f,   0.0f,   0.0f,	1.0f,
-			-0.5f,  0.5f,   1.0f,   0.0f,   0.0f,	1.0f,
+			-0.5f,  -0.5f,  1.0f,   0.0f,   0.0f,	1.0f,   0.0f,   0.0f,
+			0.5f,   -0.5f,  1.0f,   0.0f,   0.0f,	1.0f,   1.0f,   0.0f,
+			0.5f,   0.5f,   1.0f,   0.0f,   0.0f,	1.0f,   1.0f,   1.0f,
+			-0.5f,  0.5f,   1.0f,   0.0f,   0.0f,	1.0f,   0.0f,   1.0f,
 
-			-0.5f,  -0.5f,  0.0f,   0.0f,   -1.0f,	0.0f,
-			0.5f,   -0.5f,  0.0f,   0.0f,   -1.0f,	0.0f,
-			0.5f,  -0.5f,   1.0f,   0.0f,   -1.0f,	0.0f,
-			-0.5f,  -0.5f,  1.0f,   0.0f,   -1.0f,	0.0f,
+			-0.5f,  -0.5f,  0.0f,   0.0f,   -1.0f,	0.0f,   0.0f,   0.0f,
+			0.5f,   -0.5f,  0.0f,   0.0f,   -1.0f,	0.0f,   1.0f,   0.0f,
+			0.5f,	-0.5f,   1.0f,  0.0f,   -1.0f,	0.0f,   1.0f,   1.0f,
+			-0.5f,  -0.5f,  1.0f,   0.0f,   -1.0f,	0.0f,   0.0f,   1.0f,
 
-			-0.5f,  0.5f,   0.0f,   0.0f,   1.0f,	0.0f,
-			0.5f,   0.5f,   0.0f,   0.0f,   1.0f,	0.0f,
-			0.5f,   0.5f,   1.0f,   0.0f,   1.0f,	0.0f,
-			-0.5f,  0.5f,   1.0f,   0.0f,   1.0f,	0.0f,
+			-0.5f,  0.5f,   0.0f,   0.0f,   1.0f,	0.0f,   0.0f,   0.0f,
+			0.5f,   0.5f,   0.0f,   0.0f,   1.0f,	0.0f,   1.0f,   0.0f,
+			0.5f,   0.5f,   1.0f,   0.0f,   1.0f,	0.0f,   1.0f,   1.0f,
+			-0.5f,  0.5f,   1.0f,   0.0f,   1.0f,	0.0f,   0.0f,   1.0f,
 
-			-0.5f,  -0.5f,  0.0f,   -1.0f,   0.0f,	0.0f,
-			-0.5f,  0.5f,   0.0f,   -1.0f,   0.0f,	0.0f,
-			-0.5f,  0.5f,   1.0f,   -1.0f,   0.0f,	0.0f,
-			-0.5f,  -0.5f,  1.0f,   -1.0f,   0.0f,	0.0f,
+			-0.5f,  -0.5f,  0.0f,   -1.0f,   0.0f,	0.0f,   0.0f,   0.0f,
+			-0.5f,  0.5f,   0.0f,   -1.0f,   0.0f,	0.0f,   1.0f,   0.0f,
+			-0.5f,  0.5f,   1.0f,   -1.0f,   0.0f,	0.0f,   1.0f,   1.0f,
+			-0.5f,  -0.5f,  1.0f,   -1.0f,   0.0f,	0.0f,   0.0f,   1.0f,
 
-			0.5f,  -0.5f,   0.0f,   1.0f,   0.0f,	0.0f,
-			0.5f,   0.5f,   0.0f,   1.0f,   0.0f,	0.0f,
-			0.5f,   0.5f,   1.0f,   1.0f,   0.0f,	0.0f,
-			0.5f,  -0.5f,   1.0f,   1.0f,   0.0f,	0.0f
+			0.5f,  -0.5f,   0.0f,   1.0f,   0.0f,	0.0f,   0.0f,   0.0f,
+			0.5f,   0.5f,   0.0f,   1.0f,   0.0f,	0.0f,   1.0f,   0.0f,
+			0.5f,   0.5f,   1.0f,   1.0f,   0.0f,	0.0f,   1.0f,   1.0f,
+			0.5f,  -0.5f,   1.0f,   1.0f,   0.0f,	0.0f,   0.0f,   1.0f
 		};
 
 		unsigned int indices[] =
@@ -116,15 +105,20 @@ void LightLayer::OnAttach()
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+		glEnableVertexAttribArray(2);
 
 		glBindVertexArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
+		m_CubeShader.UseShader();
+		m_CubeShader.SetUniform1i("u_Material.diffuse", 0);
+		m_CubeShader.SetUniform1i("u_Material.specular", 1);
 	}
 
 	{
@@ -217,6 +211,7 @@ void LightLayer::OnImguiRender()
 
     ImGui::ColorEdit3("background color", m_ClearColor);
 
+	static int presetMaterialIdx = 1;
 	if (ImGui::CollapsingHeader("Cube"))
 	{
 		ImGui::SeparatorText("Basic property");
@@ -228,10 +223,7 @@ void LightLayer::OnImguiRender()
 
 		ImGui::SeparatorText("Material");
 
-		ImGui::DragFloat3("Cube ambient", m_CubeMaterial.ambient, 0.01f, 0.0f, 1.0f);
-		ImGui::DragFloat3("Cube diffuse", m_CubeMaterial.diffuse, 0.01f, 0.0f, 1.0f);
-		ImGui::DragFloat3("Cube specular", m_CubeMaterial.specular, 0.01f, 0.0f, 1.0f);
-		ImGui::DragInt("Cube shininess", &m_CubeMaterial.shininess, 1, 32, 2048);
+		ImGui::DragInt("Cube shininess", &m_CubeShininess, 1, 32, 2048);
 
 		ImGui::SeparatorText("Preset material");
 		
@@ -241,7 +233,6 @@ void LightLayer::OnImguiRender()
 			"pearl",
 			"red plastic"
 		};
-		static int presetMaterialIdx = 1;
 
 		const char* presetMaterialValue = presetMaterialName[presetMaterialIdx];
 
@@ -261,55 +252,6 @@ void LightLayer::OnImguiRender()
 				}
 			}
 			ImGui::EndCombo();
-		}
-
-		switch (presetMaterialIdx)
-		{
-		case 0:
-			m_CubeMaterial.ambient[0] = 0.24f;
-			m_CubeMaterial.ambient[1] = 0.19f;
-			m_CubeMaterial.ambient[2] = 0.07f;
-
-			m_CubeMaterial.diffuse[0] = 0.75f;
-			m_CubeMaterial.diffuse[1] = 0.6f;
-			m_CubeMaterial.diffuse[2] = 0.22f;
-
-			m_CubeMaterial.specular[0] = 0.62f;
-			m_CubeMaterial.specular[1] = 0.55f;
-			m_CubeMaterial.specular[2] = 0.36f;
-
-			m_CubeMaterial.shininess = 51;
-			break;
-		case 1:
-			m_CubeMaterial.ambient[0] = 0.25f;
-			m_CubeMaterial.ambient[1] = 0.20f;
-			m_CubeMaterial.ambient[2] = 0.207f;
-
-			m_CubeMaterial.diffuse[0] = 1.0f;
-			m_CubeMaterial.diffuse[1] = 0.83f;
-			m_CubeMaterial.diffuse[2] = 0.83f;
-
-			m_CubeMaterial.specular[0] = 0.3f;
-			m_CubeMaterial.specular[1] = 0.3f;
-			m_CubeMaterial.specular[2] = 0.3f;
-
-			m_CubeMaterial.shininess = 113;
-			break;
-		case 2:
-			m_CubeMaterial.ambient[0] = 0.0f;
-			m_CubeMaterial.ambient[1] = 0.0f;
-			m_CubeMaterial.ambient[2] = 0.0f;
-
-			m_CubeMaterial.diffuse[0] = 0.5f;
-			m_CubeMaterial.diffuse[1] = 0.0f;
-			m_CubeMaterial.diffuse[2] = 0.0f;
-
-			m_CubeMaterial.specular[0] = 0.7f;
-			m_CubeMaterial.specular[1] = 0.6f;
-			m_CubeMaterial.specular[2] = 0.6f;
-
-			m_CubeMaterial.shininess = 32;
-			break;
 		}
 	}
 
@@ -367,16 +309,15 @@ void LightLayer::OnUpdate(const LearnOpenGL::Timestep& timestep)
 		m_CubeShader.SetUniformMatrix4fv("u_Projection", 1, GL_FALSE, glm::value_ptr(m_CameraController.GetCamera().GetProjectionMatrix()));
 		m_CubeShader.SetUniform3f("u_Color", m_CubeColor[0], m_CubeColor[1], m_CubeColor[2]);
 		m_CubeShader.SetUniform3f("u_LightColor", m_LightColor[0], m_LightColor[1], m_LightColor[2]);
-		m_CubeShader.SetUniform3f("u_Material.ambient", m_CubeMaterial.ambient[0], m_CubeMaterial.ambient[1], m_CubeMaterial.ambient[2]);
-		m_CubeShader.SetUniform3f("u_Material.diffuse", m_CubeMaterial.diffuse[0], m_CubeMaterial.diffuse[1], m_CubeMaterial.diffuse[2]);
-		m_CubeShader.SetUniform3f("u_Material.specular", m_CubeMaterial.specular[0], m_CubeMaterial.specular[1], m_CubeMaterial.specular[2]);
-		m_CubeShader.SetUniform1i("u_Material.shininess", m_CubeMaterial.shininess);
+		m_CubeShader.SetUniform1i("u_Material.shininess", m_CubeShininess);
 		m_CubeShader.SetUniform3f("u_Light.position", m_LightTranslate[0], m_LightTranslate[1], m_LightTranslate[2]);
 		m_CubeShader.SetUniform1f("u_Light.ambient", m_LightMaterial.ambientStrength);
 		m_CubeShader.SetUniform1f("u_Light.diffuse", m_LightMaterial.diffuseStrength);
 		m_CubeShader.SetUniform1f("u_Light.specular", m_LightMaterial.specularStrength);
 		glm::vec3 cameraPos = m_CameraController.GetCamera().GetCameraPos();
 		m_CubeShader.SetUniform3f("u_CameraPos", cameraPos.x, cameraPos.y, cameraPos.z);
+		m_CubeDiffuseTexture.ActiveTexture(GL_TEXTURE0);
+		m_CubeSpecularTexture.ActiveTexture(GL_TEXTURE1);
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 	}
