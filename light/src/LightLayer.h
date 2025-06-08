@@ -41,6 +41,13 @@ private:
 	float m_LightRotate[3] =	{ 0.0f, 0.0f, 0.0f };
 	float m_LightScale[3] =		{ 0.1f, 0.1f, 0.1f };
 
+	float m_DirectionLightColor[3] = { 1.0f, 1.0f, 1.0f };
+	float m_DirectionLightDir[3] = { 0.0f, 0.0f, -1.0f };
+
+	float m_SpotLightColor[3] = { 1.0f, 1.0f, 1.0f };
+	float m_SpotLightRadian = 6.0f;
+	float m_SpotLightOutRadian = 7.5f;
+
 	int m_CubeShininess = 256;
 
 	struct LightMaterial

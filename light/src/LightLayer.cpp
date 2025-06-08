@@ -12,7 +12,7 @@
 
 LightLayer::LightLayer(const std::string& debugName)
     : Layer(debugName),
-    m_CameraController(LearnOpenGL::CameraController(glm::vec3(0.0f, 2.0f, 3.0f), -30.0f))
+    m_CameraController(LearnOpenGL::CameraController(glm::vec3(-2.0f, 2.0f, 3.0f), -30.0f, -60.0f))
 {
 	m_LightMaterial.ambientStrength = 0.1f;
 	m_LightMaterial.diffuseStrength = 0.5f;
@@ -255,21 +255,27 @@ void LightLayer::OnImguiRender()
 		}
 	}
 
-	if (ImGui::CollapsingHeader("Light"))
-	{
-		ImGui::SeparatorText("Basic property");
+	ImGui::SeparatorText("Light Material");
+	ImGui::DragFloat("Light ambient", &m_LightMaterial.ambientStrength, 0.01f, 0.0f, 1.0f);
+	ImGui::DragFloat("Light diffuse", &m_LightMaterial.diffuseStrength, 0.01f, 0.0f, 1.0f);
+	ImGui::DragFloat("Light specular", &m_LightMaterial.specularStrength, 0.01f, 0.0f, 1.0f);
 
-		ImGui::ColorEdit3("Light color", m_LightColor);
-		ImGui::DragFloat3("Light Translate", m_LightTranslate, 0.01f);
-		ImGui::DragFloat3("Light Rotate", m_LightRotate, 1.0f, -180.0f, 180.f);
-		ImGui::DragFloat3("Light Scale", m_LightScale, 0.01f);
-
-		ImGui::SeparatorText("Material");
-		ImGui::DragFloat("Light ambient", &m_LightMaterial.ambientStrength, 0.01f, 0.0f, 1.0f);
-		ImGui::DragFloat("Light diffuse", &m_LightMaterial.diffuseStrength, 0.01f, 0.0f, 1.0f);
-		ImGui::DragFloat("Light specular", &m_LightMaterial.specularStrength, 0.01f, 0.0f, 1.0f);
-	}
+	ImGui::SeparatorText("PointLight");
+	ImGui::ColorEdit3("Light color", m_LightColor);
+	ImGui::DragFloat3("Light Translate", m_LightTranslate, 0.01f);
+	ImGui::DragFloat3("Light Rotate", m_LightRotate, 1.0f, -180.0f, 180.f);
+	ImGui::DragFloat3("Light Scale", m_LightScale, 0.01f);
+	
+	ImGui::SeparatorText("DirectionLight");
+	ImGui::ColorEdit3("DirectionLight color", m_DirectionLightColor);
+	ImGui::DragFloat3("DirectionLight direction", m_DirectionLightDir, 0.001f, -1.0f, 1.0f);
+	
+	ImGui::SeparatorText("SpotLight");
+	ImGui::ColorEdit3("SpotLight color", m_SpotLightColor);
+	ImGui::DragFloat("SpotLight radian", &m_SpotLightRadian, 0.1f, 0.0f, 45.0f);
+	ImGui::DragFloat("SpotLight out radian", &m_SpotLightOutRadian, 0.1f, 0.0f, 45.0f);
    
+	ImGui::SeparatorText("Camera");
     float cameraSpeed = m_CameraController.GetCameraSpeed();
     ImGui::DragFloat("Camera Speed", (float*)&cameraSpeed);
     m_CameraController.SetCameraSpeed(cameraSpeed);
@@ -307,14 +313,32 @@ void LightLayer::OnUpdate(const LearnOpenGL::Timestep& timestep)
 		m_CubeShader.SetUniformMatrix4fv("u_Transform", 1, GL_FALSE, glm::value_ptr(trans));
 		m_CubeShader.SetUniformMatrix4fv("u_View", 1, GL_FALSE, glm::value_ptr(m_CameraController.GetCamera().GetViewMatrix()));
 		m_CubeShader.SetUniformMatrix4fv("u_Projection", 1, GL_FALSE, glm::value_ptr(m_CameraController.GetCamera().GetProjectionMatrix()));
-		m_CubeShader.SetUniform3f("u_Color", m_CubeColor[0], m_CubeColor[1], m_CubeColor[2]);
-		m_CubeShader.SetUniform3f("u_LightColor", m_LightColor[0], m_LightColor[1], m_LightColor[2]);
+
+		m_CubeShader.SetUniform3f("u_PointLight.color", m_LightColor[0], m_LightColor[1], m_LightColor[2]);
 		m_CubeShader.SetUniform1i("u_Material.shininess", m_CubeShininess);
-		m_CubeShader.SetUniform3f("u_Light.position", m_LightTranslate[0], m_LightTranslate[1], m_LightTranslate[2]);
-		m_CubeShader.SetUniform1f("u_Light.ambient", m_LightMaterial.ambientStrength);
-		m_CubeShader.SetUniform1f("u_Light.diffuse", m_LightMaterial.diffuseStrength);
-		m_CubeShader.SetUniform1f("u_Light.specular", m_LightMaterial.specularStrength);
-		glm::vec3 cameraPos = m_CameraController.GetCamera().GetCameraPos();
+		m_CubeShader.SetUniform3f("u_PointLight.position", m_LightTranslate[0], m_LightTranslate[1], m_LightTranslate[2]);
+		m_CubeShader.SetUniform1f("u_PointLight.ambient", m_LightMaterial.ambientStrength);
+		m_CubeShader.SetUniform1f("u_PointLight.diffuse", m_LightMaterial.diffuseStrength);
+		m_CubeShader.SetUniform1f("u_PointLight.specular", m_LightMaterial.specularStrength);
+
+		m_CubeShader.SetUniform3f("u_DirectionLight.direction", m_DirectionLightDir[0], m_DirectionLightDir[1], m_DirectionLightDir[2]);
+		m_CubeShader.SetUniform1f("u_DirectionLight.ambient", m_LightMaterial.ambientStrength);
+		m_CubeShader.SetUniform1f("u_DirectionLight.diffuse", m_LightMaterial.diffuseStrength);
+		m_CubeShader.SetUniform1f("u_DirectionLight.specular", m_LightMaterial.specularStrength);
+		m_CubeShader.SetUniform3f("u_DirectionLight.color", m_DirectionLightColor[0], m_DirectionLightColor[1], m_DirectionLightColor[2]);
+
+		const glm::vec3& cameraPos = m_CameraController.GetCamera().GetCameraPos();
+		const glm::vec3& cameraDir = m_CameraController.GetCamera().GetCameraDirection();
+		
+		m_CubeShader.SetUniform3f("u_SpotLight.position", cameraPos.x, cameraPos.y, cameraPos.z);
+		m_CubeShader.SetUniform3f("u_SpotLight.direction", cameraDir.x, cameraDir.y, cameraDir.z);
+		m_CubeShader.SetUniform1f("u_SpotLight.cutOff", glm::cos(glm::radians(m_SpotLightRadian)));
+		m_CubeShader.SetUniform1f("u_SpotLight.outCutOff", glm::cos(glm::radians(m_SpotLightOutRadian)));
+		m_CubeShader.SetUniform1f("u_SpotLight.ambient", m_LightMaterial.ambientStrength);
+		m_CubeShader.SetUniform1f("u_SpotLight.diffuse", m_LightMaterial.diffuseStrength);
+		m_CubeShader.SetUniform1f("u_SpotLight.specular", m_LightMaterial.specularStrength);
+		m_CubeShader.SetUniform3f("u_SpotLight.color", m_SpotLightColor[0], m_SpotLightColor[1], m_SpotLightColor[2]);
+
 		m_CubeShader.SetUniform3f("u_CameraPos", cameraPos.x, cameraPos.y, cameraPos.z);
 		m_CubeDiffuseTexture.ActiveTexture(GL_TEXTURE0);
 		m_CubeSpecularTexture.ActiveTexture(GL_TEXTURE1);

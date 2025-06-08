@@ -13,7 +13,7 @@ namespace LearnOpenGL
 	public:
 		CameraController();
 		CameraController(const glm::vec3& vec3);
-		CameraController(const glm::vec3& vec3, const float pitch);
+		CameraController(const glm::vec3& vec3, const float pitch, const float yaw);
 		~CameraController();
 
 		float GetMouseSensitivity() { return m_MouseSensitivity; }

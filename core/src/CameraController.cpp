@@ -14,15 +14,15 @@ namespace LearnOpenGL
 
 	CameraController::CameraController(const glm::vec3& vec3)
 		: m_Camera(Camera(vec3)),
-		m_CameraSpeed(0.5f),
+		m_CameraSpeed(5.0f),
 		m_MouseSensitivity(0.5f)
 	{
 
 	}
 
-	CameraController::CameraController(const glm::vec3& vec3, const float pitch)
-		: m_Camera(Camera(vec3, pitch)),
-		m_CameraSpeed(0.5f),
+	CameraController::CameraController(const glm::vec3& vec3, const float pitch, const float yaw)
+		: m_Camera(Camera(vec3, pitch, yaw)),
+		m_CameraSpeed(5.0f),
 		m_MouseSensitivity(0.5f)
 	{
 

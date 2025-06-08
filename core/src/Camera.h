@@ -11,7 +11,7 @@ namespace LearnOpenGL
 	public:
 		Camera();
 		Camera(const glm::vec3& cameraPos);
-		Camera(const glm::vec3& cameraPos, const float pitch);
+		Camera(const glm::vec3& cameraPos, const float pitch, const float yaw);
 		~Camera();
 
 		float GetFOV() { return m_FOV; }
@@ -21,6 +21,7 @@ namespace LearnOpenGL
 		float GetFarPlant() { return m_FarPlant; }
 		void SetFarPlant(const float& farPlant);
 		const glm::vec3& GetCameraPos() { return m_CameraPos; }
+		const glm::vec3& GetCameraDirection() { return m_CameraDirection; }
 		void SetCameraPos(const glm::vec3& cameraPos);
 		void AddCameraPosForward(const float& offset);
 		void AddCameraPosRight(const float& offset);
