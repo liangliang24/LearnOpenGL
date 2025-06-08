@@ -26,7 +26,8 @@ project "Core"
         "%{IncludeDir.glm}",
         "%{IncludeDir.spdlog}",
         "%{IncludeDir.ImGui}",
-        "%{IncludeDir.stb_image}"
+        "%{IncludeDir.stb_image}",
+        "%{IncludeDir.assimp}",
     }
 
     links
@@ -34,7 +35,8 @@ project "Core"
         "GLFW",
         "opengl32.lib",
         "GLAD",
-        "ImGui"
+        "ImGui",
+        "vendor/assimp/bin/assimp-vc143-mtd.dll"
     }
 
     defines

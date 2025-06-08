@@ -398,8 +398,9 @@ FodyWeavers.xsd
 *.sln.iml
 
 *.sln
-bin/*
-bin-int/*
+**/bin/
+**/bin-int/
+!core/vendor/assimp/bin
 core/bin/*
 core/bin-int/*
 example/bin/*

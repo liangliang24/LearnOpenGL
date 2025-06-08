@@ -22,6 +22,7 @@ IncludeDir["glm"]="vendor/glm"
 IncludeDir["spdlog"]="vendor/spdlog/include"
 IncludeDir["ImGui"]="vendor/imgui"
 IncludeDir["stb_image"]="vendor/stb_image"
+IncludeDir["assimp"]="vendor/assimp/include"
 
 include "core/vendor/glfw"
 include "core/vendor/glad"
