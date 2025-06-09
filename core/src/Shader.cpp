@@ -143,6 +143,11 @@ namespace LearnOpenGL
 		glUniformMatrix4fv(GetUniformLocation(uniformName), matSize, transpose, trans);
 	}
 
+	void Shader::SetUniform1iv(char* uniformName, int size, const int* value)
+	{
+		glUniform1iv(GetUniformLocation(uniformName), size, value);
+	}
+
 	void Shader::UseShader()
 	{
 		glUseProgram(m_ShaderProgram);

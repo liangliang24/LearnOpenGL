@@ -26,6 +26,7 @@ namespace LearnOpenGL
 		void SetUniform3i(char* uniformName, int x, int y, int z);
 		void SetUniform4i(char* uniformName, int x, int y, int z, int w);
 		void SetUniformMatrix4fv(char* uniformName, int matSize, bool transpose, const float* trans);
+		void SetUniform1iv(char* uniformName, int size, const int* value);
 		void UseShader();
 
 	private:
